@@ -21,14 +21,14 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE@2/fonts/variable/woff2/SUITE-Variable.css" rel="stylesheet">
 <style>
-body{margin:0;background:#F4F2EE}
+body{margin:0;background:#F4F2EE;word-break:keep-all}
 a{color:#141210}a:hover{color:#5C574F}
 .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
 .s4{grid-column:span 4}.s8{grid-column:span 8}.s12{grid-column:span 12}
 .split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:center}
 @media (max-width:1000px){.s4{grid-column:span 6}.s8{grid-column:span 12}.split{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:1000px){.wide-md{grid-column:span 12;min-height:0 !important;display:grid !important;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:end}.wide-md .tu-label{grid-column:1/-1}}
-@media (max-width:640px){.s4,.s8{grid-column:span 12}}
+@media (max-width:640px){.s4,.s8{grid-column:span 12}.s4,.s8:not(.flush),.flush-body{padding:36px 24px !important}.s12{padding:24px !important}}
 </style>
 </head>
 <body>
@@ -108,9 +108,9 @@ a{color:#141210}a:hover{color:#5C574F}
 </div>
 </article>
 
-<article class="s8" style="border-radius: 28px; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column;">
+<article class="s8 flush" style="border-radius: 28px; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column;">
 <img loading="lazy" src="images/saju.jpg" alt="한복을 입고 사주를 보는 망공이 일러스트" style="width: 100%; aspect-ratio: 1424 / 640; object-fit: cover; object-position: center 40%; display: block;">
-<div style="padding: 32px 36px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between;">
+<div class="flush-body" style="padding: 32px 36px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between;">
 <div style="display: flex; flex-direction: column; gap: 8px;">
 <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5C574F; letter-spacing: 0.04em;">02 · SAJU.JJINMANGO.KR · 2026.04~</span>
 <h2 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.03em;">찐망고 사주풀이</h2>

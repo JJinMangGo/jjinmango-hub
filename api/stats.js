@@ -69,13 +69,26 @@ async function blogTotal() {
   }
 }
 
+// 찐망고 레퍼런스 공개 숫자 (수집 사이트, 섹션) — 실패하면 null
+async function refCounts() {
+  try {
+    const res = await fetch('https://ref.jjinmango.kr/api/stats');
+    if (!res.ok) return null;
+    const d = await res.json();
+    return typeof d.sites === 'number' ? d : null;
+  } catch {
+    return null;
+  }
+}
+
 module.exports = async (req, res) => {
   try {
     const token = await getAccessToken();
-    const [s, r, blog] = await Promise.all([
+    const [s, r, blog, rc] = await Promise.all([
       report(token, process.env.GA_SAJU_PROPERTY),
       report(token, process.env.GA_REF_PROPERTY),
       blogTotal(),
+      refCounts(),
     ]);
     // Vercel 엣지 캐시: 6시간 동안 같은 값, 이후 하루까지는 옛 값 보여주면서 뒤에서 갱신
     res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
@@ -86,6 +99,8 @@ module.exports = async (req, res) => {
       sajuAvgEngagement: s.avgEngagement,
       refAvgEngagement: r.avgEngagement,
       blog,
+      refSites: rc ? rc.sites : null,
+      refSections: rc ? rc.sections : null,
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

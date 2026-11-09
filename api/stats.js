@@ -54,12 +54,28 @@ async function report(token, propertyId) {
   return { users, avgEngagement: active ? Math.round(engagement / active) : 0 };
 }
 
+// 티스토리 블로그 사이드바의 "Total 396,850" 카운터를 읽어옴 (실패하면 null)
+async function blogTotal() {
+  try {
+    const res = await fetch('https://uiweb.tistory.com/', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; jjinmango-hub/1.0)' },
+    });
+    if (!res.ok) return null;
+    const text = (await res.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const m = text.match(/Total\s*:?\s*([\d,]{4,})/i);
+    return m ? Number(m[1].replace(/,/g, '')) : null;
+  } catch {
+    return null;
+  }
+}
+
 module.exports = async (req, res) => {
   try {
     const token = await getAccessToken();
-    const [s, r] = await Promise.all([
+    const [s, r, blog] = await Promise.all([
       report(token, process.env.GA_SAJU_PROPERTY),
       report(token, process.env.GA_REF_PROPERTY),
+      blogTotal(),
     ]);
     // Vercel 엣지 캐시: 6시간 동안 같은 값, 이후 하루까지는 옛 값 보여주면서 뒤에서 갱신
     res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
@@ -69,6 +85,7 @@ module.exports = async (req, res) => {
       total: s.users + r.users,
       sajuAvgEngagement: s.avgEngagement,
       refAvgEngagement: r.avgEngagement,
+      blog,
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

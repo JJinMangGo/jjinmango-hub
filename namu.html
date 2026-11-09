@@ -1,0 +1,340 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Namu UI 기준</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 가이드 문서 한 장 — 상단 소개 → 테마 고르기 → 화면 틀 → 컴포넌트 규칙 → 사용 방법(프롬프트 복사) → 점검표 */
+:root{
+  --accent:#2F6B4F; --accent-soft:#E6EFE9; --on-accent:#fff;
+  --bg:#F6F7F5; --surface:#FFFFFF; --line:#E1E4DF; --fg:#1C211E; --muted:#66706A; --sub:#EEF0EC;
+  --ok:#1F7A4D; --warn:#A8620B; --warn-soft:#FBF0DF; --info:#2C5BA8; --info-soft:#E7EEFA;
+  --f-body:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121513; --surface:#1A1E1B; --line:#2C322E; --fg:#E7ECE8; --muted:#9AA49D; --sub:#222724;
+  --accent-soft:color-mix(in srgb,var(--accent) 22%,#1A1E1B);
+  --warn:#E0A44F; --warn-soft:#3A2C17; --info:#8FB2EE; --info-soft:#1D2A40; --ok:#6CC799; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121513; --surface:#1A1E1B; --line:#2C322E; --fg:#E7ECE8; --muted:#9AA49D; --sub:#222724;
+  --accent-soft:color-mix(in srgb,var(--accent) 22%,#1A1E1B);
+  --warn:#E0A44F; --warn-soft:#3A2C17; --info:#8FB2EE; --info-soft:#1D2A40; --ok:#6CC799; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 56px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:28px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.3}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px}
+.eyebrow{font-size:12px;letter-spacing:.06em;color:var(--accent);font-weight:600}
+button{font:inherit;cursor:pointer}
+button:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* intro */
+.intro{display:grid;gap:18px}
+.intro-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.logo i{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:var(--on-accent);font-style:normal;font-size:15px}
+.ver{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.intro h1{font-size:clamp(26px,4vw,36px);letter-spacing:-.02em}
+.intro .lead{max-width:62ch;color:var(--muted)}
+.principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.principles div{background:var(--sub);border-radius:var(--r);padding:16px}
+.principles b{display:block;font-size:14px;margin-bottom:4px}
+.principles span{font-size:13px;color:var(--muted)}
+.fake{font-size:12px;color:var(--muted)}
+
+/* section heads */
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.sec-head h2{font-size:19px}
+.sec-head p{font-size:13px;color:var(--muted)}
+
+/* theme */
+.swatches{display:flex;flex-wrap:wrap;gap:16px}
+.sw{display:grid;justify-items:center;gap:6px;background:none;border:0;color:var(--fg);font-size:13px;padding:4px}
+.sw span{width:40px;height:40px;border-radius:50%;box-shadow:0 0 0 3px var(--surface),0 0 0 4px transparent}
+.sw[aria-pressed="true"] span{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--fg)}
+.sw[aria-pressed="true"]{font-weight:600}
+.contrast{font-size:12px;display:inline-flex;gap:6px;align-items:center;background:var(--accent-soft);color:var(--fg);border-radius:99px;padding:4px 10px}
+
+/* templates */
+.tpls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px}
+.tpl{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;color:var(--fg);display:grid;gap:8px}
+.tpl[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.tpl b{font-size:14px}
+.tpl small{font-size:12px;color:var(--muted);line-height:1.4}
+.thumb{height:44px;border-radius:6px;background:var(--sub);position:relative;overflow:hidden}
+.thumb::before,.thumb::after{content:"";position:absolute;background:color-mix(in srgb,var(--muted) 30%,transparent)}
+.thumb[data-t="A"]::before{left:0;top:0;bottom:0;width:22%;background:var(--accent)}
+.thumb[data-t="B"]::before{left:0;right:0;top:0;height:24%;background:var(--accent)}
+.thumb[data-t="C"]::before{left:0;top:0;bottom:0;width:18%;background:var(--accent)}.thumb[data-t="C"]::after{left:18%;right:0;top:0;height:22%}
+.thumb[data-t="D"]::before{left:0;top:0;bottom:0;width:18%;background:var(--accent)}.thumb[data-t="D"]::after{right:0;top:0;bottom:0;width:26%}
+.thumb[data-t="E"]::before{left:20%;right:20%;top:20%;bottom:20%;border-radius:4px}
+
+/* sample screen */
+.sample{border:1px solid var(--line);border-radius:12px;background:var(--bg);display:grid;grid-template-columns:180px 1fr;overflow:hidden;min-height:340px}
+.sample[data-t="B"],.sample[data-t="E"]{grid-template-columns:1fr}
+.side{background:var(--surface);border-right:1px solid var(--line);padding:16px;display:grid;align-content:start;gap:4px}
+.sample[data-t="B"] .side{border-right:0;border-bottom:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sample[data-t="E"] .side{display:none}
+.side .brand{font-weight:700;font-size:14px;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.sample[data-t="B"] .side .brand{margin:0 14px 0 0}
+.side .brand i{width:22px;height:22px;border-radius:6px;background:var(--accent)}
+.nav{font-size:13px;padding:7px 10px;border-radius:7px;color:var(--muted)}
+.nav.on{background:var(--accent-soft);color:var(--fg);font-weight:600}
+.main{padding:20px;display:grid;gap:14px;align-content:start;min-width:0}
+.main-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.main-head h3{font-size:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.stat small{font-size:12px;color:var(--muted)}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat b em{font-style:normal;font-size:13px;font-weight:500;margin-left:2px}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:13px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:12px}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-info{background:var(--info-soft);color:var(--info)}
+.p-ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.side-panel{display:none}
+.sample[data-t="D"] .main{grid-template-columns:1fr 200px}
+.sample[data-t="D"] .side-panel{display:grid;gap:8px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;font-size:13px;grid-row:span 3}
+.sample[data-t="D"] .main > *:not(.side-panel){grid-column:1}
+.filter{display:none;gap:8px;flex-wrap:wrap}
+.sample[data-t="C"] .filter{display:flex}
+.sample[data-t="C"] .stats{display:none}
+.field{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--muted);min-width:120px}
+.form{display:none}
+.sample[data-t="E"] .stats,.sample[data-t="E"] .table-wrap{display:none}
+.sample[data-t="E"] .main{max-width:460px;margin:0 auto;width:100%}
+.sample[data-t="E"] .form{display:grid;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.form label{font-size:12px;color:var(--muted);display:grid;gap:4px}
+
+/* buttons */
+.btn{border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:0 14px;height:40px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.btn.next{background:var(--accent);border-color:var(--accent);color:var(--on-accent);height:48px;padding:0 18px;font-weight:600}
+.btn.sm{height:30px;padding:0 10px;font-size:13px}
+.btn.icon{width:36px;height:36px;padding:0;justify-content:center}
+.btn.text{border-color:transparent;background:none;color:var(--muted)}
+.btn:disabled{background:var(--sub);color:var(--muted);border-color:transparent;cursor:not-allowed}
+
+/* components */
+.rules{display:grid}
+.rule{display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line);align-items:center}
+.rule:first-child{border-top:0;padding-top:0}
+.rule b{font-size:14px}.rule b .mono{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+.rule p{font-size:12px;color:var(--muted)}
+.rule .demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;min-width:0}
+.dont{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px 12px;margin-top:6px}
+
+/* how to */
+.steps{display:grid;gap:0}
+.step{display:grid;grid-template-columns:36px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0;padding-top:0}
+.step .n{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:14px}
+.step h3{font-size:16px;margin-bottom:4px}
+.step p{font-size:14px;color:var(--muted)}
+.prompt{margin-top:12px;background:var(--sub);border-radius:var(--r);padding:16px;position:relative;font-size:14px;line-height:1.75;white-space:pre-wrap;min-width:0;overflow-wrap:anywhere}
+.prompt .btn{position:absolute;top:10px;right:10px}
+.prompt pre{margin:0;font:inherit;white-space:pre-wrap;padding-right:80px}
+
+/* checklist */
+.check{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.check label{display:flex;gap:10px;align-items:flex-start;background:var(--sub);border-radius:var(--r);padding:12px 14px;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--accent);margin-top:4px;width:16px;height:16px;flex:none}
+.check small{display:block;font-size:12px;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+
+@media (max-width:720px){
+  .panel{padding:20px}
+  .sample{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px}
+  .side .brand{margin:0 8px 0 0}
+  .sample[data-t="D"] .main{grid-template-columns:1fr}
+  .sample[data-t="D"] .side-panel{grid-row:auto}
+  .rule{grid-template-columns:1fr;gap:8px}
+}
+@media (prefers-reduced-motion:no-preference){.tpl,.sw span,.btn{transition:background .15s,box-shadow .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <section class="panel intro">
+    <div class="intro-top">
+      <div class="logo"><i>N</i>나무소프트 디자인팀</div>
+      <span class="ver mono">v1.0 · 예시 회사</span>
+    </div>
+    <div>
+      <p class="eyebrow">사내 공통 UI 기준</p>
+      <h1>AI로 만든 화면도 우리 회사 화면처럼</h1>
+    </div>
+    <p class="lead">각자 AI로 업무 화면을 만들다 보니 버튼 색도, 메뉴 위치도 제각각이 됐어요. 테마와 화면 틀을 고르고, 아래 문구를 복사해 AI에게 붙여 넣으면 같은 기준으로 만들어져요.</p>
+    <div class="principles">
+      <div><b>정답이 아니라 출발점</b><span>정보 순서, 상태 표시, 버튼 위치처럼 기본 뼈대만 맞춰요.</span></div>
+      <div><b>고르고 붙여 넣기</b><span>디자인을 몰라도 테마·틀만 고르면 요청 문구가 완성돼요.</span></div>
+      <div><b>점검표로 마무리</b><span>나온 화면은 맨 아래 점검표로 한 번 더 확인해요.</span></div>
+    </div>
+    <p class="fake">이 페이지는 블로그 설명용으로 만든 가상의 회사 예시예요.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="t-theme">
+    <div class="sec-head">
+      <div><h2 id="t-theme">1. 테마 색 고르기</h2><p>주 버튼, 선택된 메뉴, 다음 단계 버튼에만 쓰여요.</p></div>
+      <span class="contrast" id="contrast">선택: <b id="theme-name">숲</b> <span class="mono" id="theme-hex">#2F6B4F</span></span>
+    </div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-tpl">
+    <div class="sec-head">
+      <div><h2 id="t-tpl">2. 화면 틀 고르기</h2><p>메뉴 개수와 하는 일에 맞춰 골라요. 아래 예시 화면이 바뀌어요.</p></div>
+    </div>
+    <div class="tpls" id="tpls"></div>
+    <div class="sample" id="sample" data-t="A">
+      <aside class="side">
+        <div class="brand"><i></i>재고 관리</div>
+        <span class="nav on">홈</span><span class="nav">입고 목록</span><span class="nav">출고 요청</span><span class="nav">리포트</span><span class="nav">설정</span>
+      </aside>
+      <div class="main">
+        <div class="main-head">
+          <div><h3 id="sample-title">이번 주 재고 현황</h3><p class="muted" style="font-size:12px">11/3 ~ 11/7 · 예시 데이터</p></div>
+          <button class="btn primary sm" type="button">+ 입고 등록</button>
+        </div>
+        <div class="filter"><span class="field">상품명 검색</span><span class="field">상태: 전체</span><span class="field">기간: 이번 주</span></div>
+        <div class="stats">
+          <div class="stat"><small>입고</small><b>342<em>개</em></b></div>
+          <div class="stat"><small>출고</small><b>298<em>개</em></b></div>
+          <div class="stat"><small>재고 부족</small><b>6<em>품목</em></b></div>
+          <div class="stat"><small>확인 필요</small><b>3<em>건</em></b></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>날짜</th><th>상품</th><th>수량</th><th>상태</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>11/06(목)</td><td>A4 복사용지</td><td class="num">40박스</td><td><span class="pill p-warn">확인 필요</span></td><td><button class="btn sm" type="button">열기</button></td></tr>
+              <tr><td>11/06(목)</td><td>라벨 스티커</td><td class="num">12롤</td><td><span class="pill p-info">진행</span></td><td><button class="btn sm" type="button">열기</button></td></tr>
+              <tr><td>11/05(수)</td><td>택배 박스 2호</td><td class="num">300개</td><td><span class="pill p-ok">완료</span></td><td><button class="btn sm" type="button">열기</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="side-panel">
+          <b>A4 복사용지</b>
+          <span class="muted">요청: 총무팀 · 40박스</span>
+          <span class="muted">메모: 거래처 단가 확인 후 승인</span>
+          <button class="btn primary sm" type="button">승인하기</button>
+          <button class="btn sm" type="button">반려</button>
+        </div>
+        <div class="form">
+          <b>출고 요청하기</b>
+          <label>상품<span class="field">택배 박스 2호</span></label>
+          <label>수량<span class="field">50개</span></label>
+          <label>받는 팀<span class="field">물류팀</span></label>
+          <button class="btn next" type="button">다음: 요청 확인하기 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-comp">
+    <div class="sec-head">
+      <div><h2 id="t-comp">3. 컴포넌트 규칙 · 버튼</h2><p>놓이는 자리로 크기를 정해요. 화면마다 주 버튼은 1개만.</p></div>
+    </div>
+    <div class="rules">
+      <div class="rule">
+        <div><b>기본 <span class="mono">40px</span></b><p>화면 맨 위, 입력 칸 아래, 확인 창</p></div>
+        <div class="demo"><button class="btn primary" type="button">저장하기</button><button class="btn" type="button">취소</button><button class="btn" type="button" disabled>등록하기</button></div>
+      </div>
+      <div class="rule">
+        <div><b>작게 <span class="mono">30px</span></b><p>표·목록 한 줄 안에서만</p></div>
+        <div class="demo"><button class="btn sm" type="button">열기</button><button class="btn sm" type="button">수정</button><button class="btn sm text" type="button">더 보기</button></div>
+      </div>
+      <div class="rule">
+        <div><b>아이콘만 <span class="mono">36px</span></b><p>복사·삭제 같은 보조 동작, 마우스 올리면 이름 표시</p></div>
+        <div class="demo">
+          <button class="btn icon" type="button" aria-label="복사" title="복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2" fill="none"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none"/></svg></button>
+          <button class="btn icon" type="button" aria-label="삭제" title="삭제"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none"/></svg></button>
+        </div>
+      </div>
+      <div class="rule">
+        <div><b>다음 단계 <span class="mono">48px</span></b><p>단계를 넘어가는 화면, 패널 맨 아래. 테마 색은 여기에</p></div>
+        <div class="demo" style="display:grid;gap:6px;justify-items:start">
+          <button class="btn next" type="button">다음: 요청 확인하기 →</button>
+          <div class="dont">이렇게 하지 않아요 · 한 화면에 테마 색 버튼 여러 개, 버튼 이름을 "확인"으로만 쓰기</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-how">
+    <div class="sec-head">
+      <div><h2 id="t-how">4. 이렇게 써요</h2><p>nui 스킬은 회사 AI 계정에 설치되어 있어요. 고르고 말하기만 하면 돼요.</p></div>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><h3>고르기</h3><p>위에서 테마 색과 화면 틀을 골라요. 고른 값은 아래 문구에 자동으로 들어가요.</p></div></div>
+      <div class="step"><span class="n">2</span><div>
+        <h3>요청하기</h3><p>문구를 복사해 AI 새 대화에 붙여 넣어요. 하는 일을 적을수록 내 업무에 맞게 나와요.</p>
+        <div class="prompt"><button class="btn sm" type="button" id="copy">복사</button><pre id="prompt-text"></pre></div>
+      </div></div>
+      <div class="step"><span class="n">3</span><div><h3>점검하기</h3><p>화면이 나오면 "nui 점검표로 점검해줘"라고 말해요. 꼭 고쳐야 할 것부터 알려줘요.</p></div></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-check">
+    <div class="sec-head">
+      <div><h2 id="t-check">5. 점검표</h2><p>스킬도 이 항목으로 점검해요. 직접 체크해봐도 돼요.</p></div>
+      <span class="contrast" id="check-count">0 / 6 확인</span>
+    </div>
+    <div class="check" id="check">
+      <label><input type="checkbox" id="c1"><span>주 버튼이 화면에 1개<small>테마 색 버튼이 여러 개면 우선순위가 안 보여요</small></span></label>
+      <label><input type="checkbox" id="c2"><span>버튼 이름이 동사로 끝남<small>"확인" 대신 "저장하기", "승인하기"</small></span></label>
+      <label><input type="checkbox" id="c3"><span>상태는 색 + 글자로 표시<small>색만 쓰면 구분이 어려운 사람이 있어요</small></span></label>
+      <label><input type="checkbox" id="c4"><span>요약이 목록보다 위에<small>숫자 요약 → 할 일 → 상세 순서</small></span></label>
+      <label><input type="checkbox" id="c5"><span>숫자에 단위가 붙음<small>128건, 1.6일처럼</small></span></label>
+      <label><input type="checkbox" id="c6"><span>빈 화면에 안내 문구<small>데이터가 없을 때 무엇을 하면 되는지</small></span></label>
+    </div>
+  </section>
+
+  <div class="foot"><span>Namu UI 기준 · v1.0 (가상의 예시)</span><span>만든 사람 찐망고 · uiweb.tistory.com</span></div>
+</div>
+
+<script>
+const themes=[["숲","#2F6B4F"],["바다","#1F5FA8"],["노을","#B4532A"],["포도","#6A3FA8"],["먹","#2E3440"],["진달래","#B23A6B"]];
+const tpls=[["A","좌측 메뉴형","메뉴가 많고 매일 쓰는 도구"],["B","상단 메뉴형","메뉴 2~5개, 넓게 볼 때"],["C","목록·검색형","찾고 처리하는 게 주 업무"],["D","목록 + 상세형","고르면서 옆에서 처리할 때"],["E","메뉴 없는 형","신청·조회만 할 때"]];
+const titles={A:"이번 주 재고 현황",B:"이번 주 재고 현황",C:"입고 목록",D:"출고 요청 처리",E:"출고 요청"};
+let st={theme:0,tpl:"A"};
+try{const s=JSON.parse(localStorage.getItem("nui")||"null");if(s&&themes[s.theme]&&titles[s.tpl])st=s}catch(e){}
+const root=document.documentElement,sw=document.getElementById("swatches"),tp=document.getElementById("tpls"),sample=document.getElementById("sample");
+themes.forEach(([n,h],i)=>{const b=document.createElement("button");b.type="button";b.className="sw";b.innerHTML=`<span style="background:${h}"></span>${n}`;b.onclick=()=>{st.theme=i;render()};sw.appendChild(b)});
+tpls.forEach(([k,n,d])=>{const b=document.createElement("button");b.type="button";b.className="tpl";b.dataset.k=k;b.innerHTML=`<div class="thumb" data-t="${k}"></div><b>${k} · ${n}</b><small>${d}</small>`;b.onclick=()=>{st.tpl=k;render()};tp.appendChild(b)});
+function render(){
+  const [n,h]=themes[st.theme];root.style.setProperty("--accent",h);
+  document.getElementById("theme-name").textContent=n;document.getElementById("theme-hex").textContent=h;
+  [...sw.children].forEach((b,i)=>b.setAttribute("aria-pressed",i===st.theme));
+  [...tp.children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===st.tpl));
+  sample.dataset.t=st.tpl;document.getElementById("sample-title").textContent=titles[st.tpl];
+  const t=tpls.find(x=>x[0]===st.tpl);
+  document.getElementById("prompt-text").textContent=`nui(Namu UI 기준) 스킬로 (화면 이름) 화면 만들어줘.
+- 테마: ${n} (${h})
+- 틀: ${t[0]} ${t[1]}
+- 누가 쓰는지 (선택): 예) 총무팀 3명
+- 하는 일 (적으면 더 잘 맞춰요): 예) 비품 요청을 보고 승인·반려`;
+  try{localStorage.setItem("nui",JSON.stringify(st))}catch(e){}
+}
+render();
+const copyBtn=document.getElementById("copy");
+copyBtn.onclick=()=>{const txt=document.getElementById("prompt-text").textContent;
+  const done=()=>{copyBtn.textContent="복사됨";setTimeout(()=>copyBtn.textContent="복사",1500)};
+  navigator.clipboard?.writeText(txt).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById("prompt-text"));const s=getSelection();s.removeAllRanges();s.addRange(r);copyBtn.textContent="선택됨 · Ctrl+C"})};
+const boxes=[...document.querySelectorAll("#check input")];
+boxes.forEach(b=>b.onchange=()=>document.getElementById("check-count").textContent=`${boxes.filter(x=>x.checked).length} / 6 확인`);
+</script>
+
+</body></html>

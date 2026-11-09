@@ -63,7 +63,7 @@ a{color:#141210}a:hover{color:#5C574F}
 </section>
 
 <section class="s4 wide-md" style="border-radius: 28px; min-height: 500px; background: #141210; color: #FFFFFF; padding: 36px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px;">
-<span class="tu-label" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #BDB6AA; letter-spacing: 0.04em;">TOTAL USERS</span>
+<span class="tu-label" style="display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #BDB6AA; letter-spacing: 0.04em;">TOTAL USERS<span id="live-badge" style="display: none; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; border: 1px solid #3A352D; color: #D9D3C8;"><span style="width: 6px; height: 6px; border-radius: 50%; background: #3DDC84;"></span>GA4 API 연동</span></span>
 <div style="display: flex; flex-direction: column; gap: 8px;">
 <strong style="font-family: 'IBM Plex Mono', monospace; font-size: 72px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; color: #FFB000;" data-stat="total">1,926</strong>
 <span style="font-size: 15px; color: #D9D3C8;">두 서비스를 찾아온 사용자</span>
@@ -210,7 +210,7 @@ a{color:#141210}a:hover{color:#5C574F}
 </section>
 
 </div>
-<p style="margin: 28px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5C574F;">© 2026 찐망고 · jjinmango.kr</p>
+<p style="margin: 28px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5C574F;">© 2026 찐망고 · jjinmango.kr<span id="stats-note" hidden> · 숫자는 GA4 Data API·티스토리·레퍼런스 DB에서 자동 갱신 (<span id="stats-time"></span> 기준)</span></p>
 </main>
 
 </div>
@@ -238,6 +238,13 @@ a{color:#141210}a:hover{color:#5C574F}
   }
   fetch('/api/stats').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
     if (!d) return;
+    var b = document.getElementById('live-badge'), n = document.getElementById('stats-note'), t = document.getElementById('stats-time');
+    if (b) b.style.display = 'inline-flex';
+    if (n && t && d.updatedAt) {
+      var u = new Date(d.updatedAt);
+      t.textContent = (u.getMonth() + 1) + '.' + u.getDate() + ' ' + String(u.getHours()).padStart(2, '0') + ':' + String(u.getMinutes()).padStart(2, '0');
+      n.hidden = false;
+    }
     els.forEach(function (el) {
       var v = d[el.getAttribute('data-stat')];
       if (typeof v !== 'number' || v <= 0) return;

@@ -37,30 +37,40 @@ async function getAccessToken() {
   return (await res.json()).access_token;
 }
 
-async function totalUsers(token, propertyId) {
+async function report(token, propertyId) {
   const res = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       dateRanges: [{ startDate: START_DATE, endDate: 'today' }],
-      metrics: [{ name: 'totalUsers' }],
+      metrics: [{ name: 'totalUsers' }, { name: 'activeUsers' }, { name: 'userEngagementDuration' }],
     }),
   });
   if (!res.ok) throw new Error(`report ${propertyId} ${res.status}`);
   const data = await res.json();
-  return Number(data.rows?.[0]?.metricValues?.[0]?.value || 0);
+  const v = (data.rows?.[0]?.metricValues || []).map((m) => Number(m.value || 0));
+  const [users = 0, active = 0, engagement = 0] = v;
+  // GA4 화면의 '평균 참여 시간(활성 사용자당)'과 같은 계산 (초)
+  return { users, avgEngagement: active ? Math.round(engagement / active) : 0 };
 }
 
 module.exports = async (req, res) => {
   try {
     const token = await getAccessToken();
-    const [saju, ref] = await Promise.all([
-      totalUsers(token, process.env.GA_SAJU_PROPERTY),
-      totalUsers(token, process.env.GA_REF_PROPERTY),
+    const [s, r] = await Promise.all([
+      report(token, process.env.GA_SAJU_PROPERTY),
+      report(token, process.env.GA_REF_PROPERTY),
     ]);
     // Vercel 엣지 캐시: 6시간 동안 같은 값, 이후 하루까지는 옛 값 보여주면서 뒤에서 갱신
     res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
-    res.status(200).json({ saju, ref, total: saju + ref, updatedAt: new Date().toISOString() });
+    res.status(200).json({
+      saju: s.users,
+      ref: r.users,
+      total: s.users + r.users,
+      sajuAvgEngagement: s.avgEngagement,
+      refAvgEngagement: r.avgEngagement,
+      updatedAt: new Date().toISOString(),
+    });
   } catch (err) {
     res.setHeader('Cache-Control', 'no-store');
     res.status(500).json({ error: String(err.message || err) });

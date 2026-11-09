@@ -65,7 +65,7 @@ a{color:#141210}a:hover{color:#5C574F}
 <section class="s4 wide-md" style="border-radius: 28px; min-height: 500px; background: #141210; color: #FFFFFF; padding: 36px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px;">
 <span class="tu-label" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #BDB6AA; letter-spacing: 0.04em;">TOTAL USERS</span>
 <div style="display: flex; flex-direction: column; gap: 8px;">
-<strong style="font-family: 'IBM Plex Mono', monospace; font-size: 72px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; color: #FFB000;" data-stat="total">1,800+</strong>
+<strong style="font-family: 'IBM Plex Mono', monospace; font-size: 72px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; color: #FFB000;" data-stat="total">1,926</strong>
 <span style="font-size: 15px; color: #D9D3C8;">두 서비스를 찾아온 사용자</span>
 </div>
 <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 20px; border-top: 1px solid #3A352D;">
@@ -94,7 +94,7 @@ a{color:#141210}a:hover{color:#5C574F}
 </ul>
 <dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-top: 6px; border-top: 1px solid #ECE8E1;">
 <div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">수집 사이트</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;">444</dd></div>
-<div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">첫 달 방문</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;">1,100</dd></div>
+<div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">누적 방문</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;" data-stat="ref">1,113</dd></div>
 <div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">섹션</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;">2,158</dd></div>
 </dl>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -118,9 +118,9 @@ a{color:#141210}a:hover{color:#5C574F}
 <p style="margin: 0; font-size: 16px; color: #4A453E;">타고난 행동 알고리즘을 풀어주는 AI 분석.</p>
 </div>
 <dl style="margin: 0; display: flex; gap: 28px;">
-<div><dt style="font-size: 13px; color: #5C574F;">누적 사용자</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;" data-stat="saju">714</dd></div>
-<div><dt style="font-size: 13px; color: #5C574F;">평균 체류</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;">4:10</dd></div>
-<div><dt style="font-size: 13px; color: #5C574F;">운영</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;">7개월</dd></div>
+<div><dt style="font-size: 13px; color: #5C574F;">누적 사용자</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;" data-stat="saju">813</dd></div>
+<div><dt style="font-size: 13px; color: #5C574F;">평균 체류</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;" data-stat="sajuAvgEngagement" data-format="time">4:10</dd></div>
+<div><dt style="font-size: 13px; color: #5C574F;">운영</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;" data-since="2026-04">7개월</dd></div>
 </dl>
 <div style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%;">
 <a href="https://saju.jjinmango.kr/" style="display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #141210; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px;">써보기 ↗</a>
@@ -216,6 +216,12 @@ a{color:#141210}a:hover{color:#5C574F}
 </div>
 <script>
 (function () {
+  // 운영 개월 수: 시작 월부터 이번 달까지
+  document.querySelectorAll('[data-since]').forEach(function (el) {
+    var p = el.getAttribute('data-since').split('-'), n = new Date();
+    var m = (n.getFullYear() - +p[0]) * 12 + (n.getMonth() + 1 - +p[1]);
+    if (m > 0) el.textContent = m + '개월';
+  });
   var els = document.querySelectorAll('[data-stat]');
   if (!els.length || !window.fetch) return;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -234,7 +240,10 @@ a{color:#141210}a:hover{color:#5C574F}
     if (!d) return;
     els.forEach(function (el) {
       var v = d[el.getAttribute('data-stat')];
-      if (typeof v === 'number' && v > 0) countUp(el, v);
+      if (typeof v !== 'number' || v <= 0) return;
+      if (el.getAttribute('data-format') === 'time') {
+        el.textContent = Math.floor(v / 60) + ':' + String(v % 60).padStart(2, '0');
+      } else countUp(el, v);
     });
   }).catch(function () {});
 })();

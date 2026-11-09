@@ -1,0 +1,68 @@
+// GA4 누적 사용자 수를 불러오는 Vercel 서버리스 함수 (외부 패키지 없음)
+// 필요한 Vercel 환경변수:
+//   GA_CLIENT_EMAIL   서비스 계정 이메일
+//   GA_PRIVATE_KEY    서비스 계정 JSON의 private_key 값 그대로
+//   GA_SAJU_PROPERTY  찐망고 사주 GA4 속성 ID (숫자)
+//   GA_REF_PROPERTY   찐망고 레퍼런스 GA4 속성 ID (숫자)
+
+const crypto = require('crypto');
+
+const START_DATE = '2026-01-01';
+
+function b64url(input) {
+  return Buffer.from(input).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+async function getAccessToken() {
+  const email = process.env.GA_CLIENT_EMAIL;
+  const key = (process.env.GA_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const claim = b64url(JSON.stringify({
+    iss: email,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  }));
+  const signature = crypto.createSign('RSA-SHA256').update(`${header}.${claim}`).sign(key);
+  const jwt = `${header}.${claim}.${b64url(signature)}`;
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt }),
+  });
+  if (!res.ok) throw new Error(`token ${res.status}`);
+  return (await res.json()).access_token;
+}
+
+async function totalUsers(token, propertyId) {
+  const res = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      dateRanges: [{ startDate: START_DATE, endDate: 'today' }],
+      metrics: [{ name: 'totalUsers' }],
+    }),
+  });
+  if (!res.ok) throw new Error(`report ${propertyId} ${res.status}`);
+  const data = await res.json();
+  return Number(data.rows?.[0]?.metricValues?.[0]?.value || 0);
+}
+
+module.exports = async (req, res) => {
+  try {
+    const token = await getAccessToken();
+    const [saju, ref] = await Promise.all([
+      totalUsers(token, process.env.GA_SAJU_PROPERTY),
+      totalUsers(token, process.env.GA_REF_PROPERTY),
+    ]);
+    // Vercel 엣지 캐시: 6시간 동안 같은 값, 이후 하루까지는 옛 값 보여주면서 뒤에서 갱신
+    res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
+    res.status(200).json({ saju, ref, total: saju + ref, updatedAt: new Date().toISOString() });
+  } catch (err) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(500).json({ error: String(err.message || err) });
+  }
+};

@@ -65,7 +65,7 @@ a{color:#141210}a:hover{color:#5C574F}
 <section class="s4 wide-md" style="border-radius: 28px; min-height: 500px; background: #141210; color: #FFFFFF; padding: 36px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px;">
 <span class="tu-label" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #BDB6AA; letter-spacing: 0.04em;">TOTAL USERS</span>
 <div style="display: flex; flex-direction: column; gap: 8px;">
-<strong style="font-family: 'IBM Plex Mono', monospace; font-size: 72px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; color: #FFB000;">1,800+</strong>
+<strong style="font-family: 'IBM Plex Mono', monospace; font-size: 72px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; color: #FFB000;" data-stat="total">1,800+</strong>
 <span style="font-size: 15px; color: #D9D3C8;">두 서비스를 찾아온 사용자</span>
 </div>
 <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 20px; border-top: 1px solid #3A352D;">
@@ -118,7 +118,7 @@ a{color:#141210}a:hover{color:#5C574F}
 <p style="margin: 0; font-size: 16px; color: #4A453E;">타고난 행동 알고리즘을 풀어주는 AI 분석.</p>
 </div>
 <dl style="margin: 0; display: flex; gap: 28px;">
-<div><dt style="font-size: 13px; color: #5C574F;">누적 사용자</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;">714</dd></div>
+<div><dt style="font-size: 13px; color: #5C574F;">누적 사용자</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;" data-stat="saju">714</dd></div>
 <div><dt style="font-size: 13px; color: #5C574F;">평균 체류</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;">4:10</dd></div>
 <div><dt style="font-size: 13px; color: #5C574F;">운영</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500;">7개월</dd></div>
 </dl>
@@ -214,5 +214,30 @@ a{color:#141210}a:hover{color:#5C574F}
 </main>
 
 </div>
+<script>
+(function () {
+  var els = document.querySelectorAll('[data-stat]');
+  if (!els.length || !window.fetch) return;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(el, to) {
+    if (reduce) { el.textContent = to.toLocaleString('ko-KR'); return; }
+    var from = Math.round(to * 0.6), start = null, dur = 1200;
+    function step(t) {
+      if (!start) start = t;
+      var p = Math.min((t - start) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (to - from) * e).toLocaleString('ko-KR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  fetch('/api/stats').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d) return;
+    els.forEach(function (el) {
+      var v = d[el.getAttribute('data-stat')];
+      if (typeof v === 'number' && v > 0) countUp(el, v);
+    });
+  }).catch(function () {});
+})();
+</script>
 </body>
 </html>

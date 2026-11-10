@@ -29,6 +29,7 @@ a{color:#141210}a:hover{color:#5C574F}
 .split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:center}
 @media (max-width:1000px){.s4{grid-column:span 6}.s8{grid-column:span 12}.split{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:1000px){.wide-md{grid-column:span 12;min-height:0 !important;display:grid !important;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:end}.wide-md .tu-label{grid-column:1/-1}}
+@media (min-width:641px) and (max-width:1000px){.pair-md{grid-column:span 12;flex-direction:row !important}}
 @media (max-width:640px){.s4,.s8{grid-column:span 12}.s12{padding:24px !important}}
 </style>
 </head>
@@ -164,7 +165,7 @@ a{color:#141210}a:hover{color:#5C574F}
 </div>
 </article>
 
-<div class="s4" style="display: flex; flex-direction: column; gap: 14px;">
+<div class="s4 pair-md" style="display: flex; flex-direction: column; gap: 14px;">
 <article style="flex: 1 1 0; border-radius: 28px; background: #FFFFFF; padding: 30px 32px; display: flex; flex-direction: column; gap: 10px;">
 <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5C574F;">WRITING</span>
 <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">처음 읽는 AI 시스템 설계</h2>

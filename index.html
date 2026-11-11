@@ -93,9 +93,10 @@ a{color:#141210}a:hover{color:#5C574F}
 <li style="font-size: 13px; padding: 7px 12px; border-radius: 999px; background: #F4F2EE;">AI 와이어프레임</li>
 <li style="font-size: 13px; padding: 7px 12px; border-radius: 999px; background: #F4F2EE;">섹션 자르기 도구</li>
 </ul>
-<dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-top: 6px; border-top: 1px solid #ECE8E1;">
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 12px; padding-top: 6px; border-top: 1px solid #ECE8E1;">
 <div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">수집 사이트</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;" data-stat="refSites">444</dd></div>
 <div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">첫 달 방문</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;">1,100</dd></div>
+<div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">출시</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;" data-days-since="2026-10-19"><span data-days>24</span><span style="font-family: 'SUITE Variable', system-ui, sans-serif; font-size: 15px; margin-left: 2px;">일째</span></dd></div>
 <div style="padding-top: 14px;"><dt style="font-size: 13px; color: #5C574F;">섹션</dt><dd style="margin: 4px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;" data-stat="refSections">2,158</dd></div>
 </dl>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -240,6 +241,14 @@ a{color:#141210}a:hover{color:#5C574F}
     var p = el.getAttribute('data-since').split('-'), n = new Date();
     var m = (n.getFullYear() - +p[0]) * 12 + (n.getMonth() + 1 - +p[1]);
     if (m > 0) el.textContent = m + '개월';
+  });
+  // 출시 N일째: 출시일을 1일째로 셈
+  document.querySelectorAll('[data-days-since]').forEach(function (el) {
+    var p = el.getAttribute('data-days-since').split('-'), n = new Date();
+    var start = new Date(+p[0], +p[1] - 1, +p[2]), today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var d = Math.round((today - start) / 86400000) + 1;
+    var t = el.querySelector('[data-days]');
+    if (d > 0 && t) t.textContent = d.toLocaleString('ko-KR');
   });
   var els = document.querySelectorAll('[data-stat]');
   if (!els.length || !window.fetch) return;

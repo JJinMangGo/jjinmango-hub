@@ -80,6 +80,37 @@ async function returning(token, propertyId) {
   }
 }
 
+// 레퍼런스 이벤트별 사용자 수 (검색, 섹션 열기, 무드보드 담기, 사이트 열기) — 실패하면 null
+const REF_EVENTS = ['search', 'section_open', 'board_add', 'site_visit'];
+async function eventUsers(token, propertyId, totalUsers) {
+  try {
+    const res = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: START_DATE, endDate: 'today' }],
+        dimensions: [{ name: 'eventName' }],
+        metrics: [{ name: 'totalUsers' }, { name: 'eventCount' }],
+        dimensionFilter: { filter: { fieldName: 'eventName', inListFilter: { values: REF_EVENTS } } },
+      }),
+    });
+    if (!res.ok) return null;
+    const out = {};
+    for (const e of REF_EVENTS) out[e] = { users: 0, count: 0, rate: 0 };
+    for (const r of (await res.json()).rows || []) {
+      const users = Number(r.metricValues[0].value);
+      out[r.dimensionValues[0].value] = {
+        users,
+        count: Number(r.metricValues[1].value),
+        rate: totalUsers ? Math.round((users / totalUsers) * 1000) / 10 : 0, // 전체 사용자 대비 %
+      };
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}
+
 // 티스토리 블로그 사이드바의 "Total 396,850" 카운터를 읽어옴 (실패하면 null)
 async function blogTotal() {
   try {
@@ -131,6 +162,7 @@ module.exports = async (req, res) => {
       refSections: rc ? rc.sections : null,
       sajuNewVsReturning: sRet,
       refNewVsReturning: rRet,
+      refEvents: await eventUsers(token, process.env.GA_REF_PROPERTY, r.users),
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

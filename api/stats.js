@@ -54,6 +54,27 @@ async function report(token, propertyId) {
   return { users, avgEngagement: active ? Math.round(engagement / active) : 0 };
 }
 
+// 신규 vs 재방문 사용자 (GA4 newVsReturning 차원) — 실패하면 null
+async function returning(token, propertyId) {
+  try {
+    const res = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: START_DATE, endDate: 'today' }],
+        dimensions: [{ name: 'newVsReturning' }],
+        metrics: [{ name: 'activeUsers' }],
+      }),
+    });
+    if (!res.ok) return null;
+    const out = {};
+    for (const r of (await res.json()).rows || []) out[r.dimensionValues[0].value || 'unknown'] = Number(r.metricValues[0].value);
+    return { new: out.new || 0, returning: out.returning || 0 };
+  } catch {
+    return null;
+  }
+}
+
 // 티스토리 블로그 사이드바의 "Total 396,850" 카운터를 읽어옴 (실패하면 null)
 async function blogTotal() {
   try {
@@ -84,11 +105,13 @@ async function refCounts() {
 module.exports = async (req, res) => {
   try {
     const token = await getAccessToken();
-    const [s, r, blog, rc] = await Promise.all([
+    const [s, r, blog, rc, sRet, rRet] = await Promise.all([
       report(token, process.env.GA_SAJU_PROPERTY),
       report(token, process.env.GA_REF_PROPERTY),
       blogTotal(),
       refCounts(),
+      returning(token, process.env.GA_SAJU_PROPERTY),
+      returning(token, process.env.GA_REF_PROPERTY),
     ]);
     // Vercel 엣지 캐시: 6시간 동안 같은 값, 이후 하루까지는 옛 값 보여주면서 뒤에서 갱신
     res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
@@ -101,6 +124,8 @@ module.exports = async (req, res) => {
       blog,
       refSites: rc ? rc.sites : null,
       refSections: rc ? rc.sections : null,
+      sajuNewVsReturning: sRet,
+      refNewVsReturning: rRet,
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

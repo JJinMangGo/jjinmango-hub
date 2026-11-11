@@ -63,13 +63,18 @@ async function returning(token, propertyId) {
       body: JSON.stringify({
         dateRanges: [{ startDate: START_DATE, endDate: 'today' }],
         dimensions: [{ name: 'newVsReturning' }],
-        metrics: [{ name: 'activeUsers' }],
+        metrics: [{ name: 'activeUsers' }, { name: 'userEngagementDuration' }],
       }),
     });
     if (!res.ok) return null;
     const out = {};
-    for (const r of (await res.json()).rows || []) out[r.dimensionValues[0].value || 'unknown'] = Number(r.metricValues[0].value);
-    return { new: out.new || 0, returning: out.returning || 0 };
+    for (const r of (await res.json()).rows || []) {
+      const users = Number(r.metricValues[0].value), secs = Number(r.metricValues[1].value);
+      // avgSec: GA4 '평균 참여 시간(활성 사용자당)'과 같은 계산 (초)
+      out[r.dimensionValues[0].value || 'unknown'] = { users, avgSec: users ? Math.round(secs / users) : 0 };
+    }
+    const empty = { users: 0, avgSec: 0 };
+    return { new: out.new || empty, returning: out.returning || empty };
   } catch {
     return null;
   }
